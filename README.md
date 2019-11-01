@@ -5,6 +5,11 @@ Monocular MSCKF with ROS Support
 - ROS Kinetic with Boost, OpenCV and Eigen
 - https://github.com/uzh-rpg/fast build and install according to their instructions
 
+# Build
+```
+catkin build fast msckf_mono
+```
+
 # Euroc Dataset -- ROS Bag
 Download MH_03_medium.bag from into the euroc folder in this repository.
 
