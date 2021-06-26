@@ -15,6 +15,11 @@
   <arg name="keyframe_rot_dist" default="0.5"/>
   <arg name="min_track_length" default="5"/>
   <arg name="max_cam_states" default="30"/>
+  
+  <!-- saving trajectory path -->
+  <arg name="dosave"      default="false" />
+  <arg name="path_est"    default="/tmp/traj_estimate.txt" />
+  <arg name="show_rviz"   default="false" />
 
   <!-- Path to kalibr calibration -->
   <arg name="kalibr_yaml" default="$(find msckf_mono)/euroc/euroc.yaml"/>
@@ -59,6 +64,16 @@
 
   <node pkg="rosbag" type="play" name="playback" args="--clock -s $(arg stand_still_end) $(arg bagname)" output="screen" required="true"/>
 
-  <node pkg="rviz" name="msckf_rviz" type="rviz" args="-d $(find msckf_mono)/euroc/rviz.rviz"/>
+  <group if="$(arg show_rviz)">
+    <node pkg="rviz" name="msckf_rviz" type="rviz" args="-d $(find msckf_mono)/euroc/rviz.rviz"/>
+  </group>
+
+  <group if="$(arg dosave)">
+    <node name="recorder_estimate" pkg="msckf_mono" type="pose_to_file" output="screen" required="true">
+        <param name="topic"      type="str" value="/msckf/odom" />
+        <param name="topic_type" type="str" value="Odometry" />
+        <param name="output"     type="str" value="$(arg path_est)" />
+    </node>
+  </group>
 
 </launch>

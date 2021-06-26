@@ -107,3 +107,6 @@ target_link_libraries(msckf_mono_node msckf_mono ${LINK_LIBS})
 
 # add_executable(pcv_msckf datasets/penncosy_msckf.cpp datasets/penncosy_readers.cpp)
 # target_link_libraries(pcv_msckf ${LINK_LIBS} msckf_mono)
+
+add_executable(pose_to_file src/pose_to_file.cpp)
+target_link_libraries(pose_to_file ${LINK_LIBS})
