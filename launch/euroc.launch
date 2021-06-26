@@ -1,12 +1,23 @@
 <?xml version="1.0"?>
 <launch>
   <param name="/use_sim_time" value="true"/>
-  <arg name="start_move_time" default="10" doc="time to start moving into rosbag"/>
-  <!-- Path to MH_03 bag -->
-  <arg name="mh_03_bag" default="$(find msckf_mono)/euroc/MH_03_medium.bag"/>
+  <!-- msckf_mono can successful initialize with the below settings.
+    data  stand_still_end  keyframe_transl_dist  keyframe_rot_dist  min_track_length  max_cam_states
+    MH 01  6  0.5  0.5  5  30
+    MH 02  2  0.1  0.1  4  10
+    MH 03  0  0.5  0.5  5  30
+    MH 04  0  0.5  0.5  5  30
+    MH 05  1  0.5  0.5  5  30 -->
 
-  <!-- Path to MH_03 kalibr calibration -->
-  <arg name="kalibr_yaml" default="$(find msckf_mono)/euroc/MH_03_kalibr.yaml"/>
+  <arg name="stand_still_end" default="10" doc="time to start moving into rosbag"/>
+  <arg name="bagname" default="$(find msckf_mono)/euroc/MH_03_medium.bag"/>
+  <arg name="keyframe_transl_dist" default="0.5"/>
+  <arg name="keyframe_rot_dist" default="0.5"/>
+  <arg name="min_track_length" default="5"/>
+  <arg name="max_cam_states" default="30"/>
+
+  <!-- Path to kalibr calibration -->
+  <arg name="kalibr_yaml" default="$(find msckf_mono)/euroc/euroc.yaml"/>
 
   <group ns="msckf">
     <rosparam command="load" file="$(arg kalibr_yaml)"/>
@@ -28,12 +39,12 @@
     <param name="max_gn_cost_norm" value="7"/>
     <param name="translation_threshold" value="0.1"/>
 
-    <param name="keyframe_transl_dist" value="0.5"/>
-    <param name="keyframe_rot_dist" value="0.5"/>
+    <param name="keyframe_transl_dist" value="$(arg keyframe_transl_dist)"/>
+    <param name="keyframe_rot_dist" value="$(arg keyframe_rot_dist)"/>
 
-    <param name="min_track_length" value="5"/>
+    <param name="min_track_length" value="$(arg min_track_length)"/>
     <param name="max_track_length" value="50"/>
-    <param name="max_cam_states" value="30"/>
+    <param name="max_cam_states" value="$(arg max_cam_states)"/>
 
     <param name="ransac_threshold" value="0.00000002"/>
 
@@ -46,7 +57,7 @@
     </node>
   </group>
 
-  <node pkg="rosbag" type="play" name="playback" args="--clock -s $(arg start_move_time) $(arg mh_03_bag)" output="screen"/>
+  <node pkg="rosbag" type="play" name="playback" args="--clock -s $(arg stand_still_end) $(arg bagname)" output="screen" required="true"/>
 
   <node pkg="rviz" name="msckf_rviz" type="rviz" args="-d $(find msckf_mono)/euroc/rviz.rviz"/>
 
