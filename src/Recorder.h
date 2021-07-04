@@ -94,6 +94,7 @@ public:
     timestamp = msg->header.stamp.toSec();
     q_ItoG << msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z, msg->pose.pose.orientation.w;
     p_IinG << msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z;
+    v_IinG << msg->twist.twist.linear.x, msg->twist.twist.linear.y, msg->twist.twist.linear.z;
     cov_pos << msg->pose.covariance.at(0), msg->pose.covariance.at(1), msg->pose.covariance.at(2), msg->pose.covariance.at(6),
         msg->pose.covariance.at(7), msg->pose.covariance.at(8), msg->pose.covariance.at(12), msg->pose.covariance.at(13),
         msg->pose.covariance.at(14);
@@ -101,6 +102,7 @@ public:
         msg->pose.covariance.at(28), msg->pose.covariance.at(29), msg->pose.covariance.at(33), msg->pose.covariance.at(34),
         msg->pose.covariance.at(35);
     has_covariance = true;
+    has_velocity = true;
     write();
   }
 
@@ -164,7 +166,9 @@ protected:
     outfile.precision(6);
     outfile << p_IinG.x() << " " << p_IinG.y() << " " << p_IinG.z() << " " << q_ItoG(0) << " " << q_ItoG(1) << " " << q_ItoG(2) << " "
             << q_ItoG(3);
-
+    if (has_velocity) {
+      outfile << " " << v_IinG.x() << " " << v_IinG.y() << " " << v_IinG.z();
+    }
     // output the covariance only if we have it
     if (has_covariance) {
       outfile.precision(10);
@@ -181,9 +185,11 @@ protected:
 
   // Temp storage objects for our pose and its certainty
   bool has_covariance = false;
+  bool has_velocity = false;
   double timestamp;
   Eigen::Vector4d q_ItoG;
   Eigen::Vector3d p_IinG;
+  Eigen::Vector3d v_IinG;
   Eigen::Matrix<double, 3, 3> cov_rot;
   Eigen::Matrix<double, 3, 3> cov_pos;
 };
